@@ -1,0 +1,148 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Minecraft Space Terminal</title>
+    <style>
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+        }
+
+        body {
+            background-color: #020208;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            min-height: 100vh;
+            overflow: hidden;
+            position: relative;
+            user-select: none;
+        }
+
+        /* 4K Космический холст */
+        #space-canvas {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            z-index: 1;
+            pointer-events: none;
+        }
+
+        /* Табличка из Майнкрафта */
+        .minecraft-sign {
+            position: relative;
+            z-index: 10;
+            /* Текстура дубовой таблички Minecraft */
+            background-color: #b78443;
+            border: 4px solid #583e20;
+            box-shadow: 
+                inset -4px -4px 0px #79572d, 
+                inset 4px 4px 0px #d49f59,
+                0px 15px 30px rgba(0, 0, 0, 0.7);
+            
+            width: 320px;
+            padding: 18px 10px;
+            text-align: center;
+            
+            /* Стилизация текста под майнкрафт */
+            font-family: 'Courier New', Courier, monospace;
+            font-weight: bold;
+            font-size: 1.3rem;
+            color: #1c130c;
+            text-shadow: 1px 1px 0px #e1b479;
+            line-height: 1.4;
+            letter-spacing: 0.5px;
+            
+            /* Эффект пиксельности */
+            image-rendering: pixelated;
+        }
+
+        /* Текст на табличке */
+        .sign-text {
+            word-wrap: break-word;
+        }
+        
+        .line-1 {
+            margin-bottom: 5px;
+        }
+    </style>
+</head>
+<body>
+
+    <!-- Живой космос на фоне -->
+    <canvas id="space-canvas"></canvas>
+
+    <!-- Табличка Minecraft -->
+    <div class="minecraft-sign">
+        <div class="sign-text">
+            <div class="line-1">rotoviebaniyloh</div>
+            <div class="line-2">"выебал тебя"</div>
+        </div>
+    </div>
+
+    <script>
+        // --- СКРИПТ ЖИВОГО КОСМОСА С ПАРАЛЛАКСОМ ---
+        const canvas = document.getElementById('space-canvas');
+        const ctx = canvas.getContext('2d');
+
+        let stars = [];
+        const numStars = 150;
+        let mouseX = 0, mouseY = 0;
+
+        function resizeCanvas() {
+            canvas.width = window.innerWidth;
+            canvas.height = window.innerHeight;
+        }
+        window.addEventListener('resize', resizeCanvas);
+        resizeCanvas();
+
+        // Генерация звёзд
+        for (let i = 0; i < numStars; i++) {
+            stars.push({
+                x: Math.random() * canvas.width,
+                y: Math.random() * canvas.height,
+                size: Math.random() * 1.8,
+                speedX: (Math.random() - 0.5) * 0.15,
+                speedY: (Math.random() - 0.5) * 0.15,
+                depth: Math.random() * 12
+            });
+        }
+
+        // Параллакс эффект при движении мыши
+        window.addEventListener('mousemove', (e) => {
+            mouseX = (e.clientX - window.innerWidth / 2) * 0.04;
+            mouseY = (e.clientY - window.innerHeight / 2) * 0.04;
+        });
+
+        function animate() {
+            ctx.clearRect(0, 0, canvas.width, canvas.height);
+            ctx.fillStyle = '#ffffff';
+
+            stars.forEach(star => {
+                let renderX = star.x + (mouseX * (star.depth * 0.1));
+                let renderY = star.y + (mouseY * (star.depth * 0.1));
+
+                ctx.beginPath();
+                ctx.arc(renderX, renderY, star.size, 0, Math.PI * 2);
+                ctx.fill();
+
+                star.x += star.speedX;
+                star.y += star.speedY;
+
+                if (star.x < 0) star.x = canvas.width;
+                if (star.x > canvas.width) star.x = 0;
+                if (star.y < 0) star.y = canvas.height;
+                if (star.y > canvas.height) star.y = 0;
+            });
+
+            requestAnimationFrame(animate);
+        }
+        animate();
+    </script>
+</body>
+</html>
